@@ -24,7 +24,7 @@ class vcam:
         self.Ty = 0
         self.Tz = 0
 
-        self.K = 0  # camera coordinate 3D -> image 2D
+        self.K = 0  # camera coordinate== 3D -> image 2D
         self.R = 0
         self.sh = 0  # Shere factor
         self.P = 0
@@ -54,6 +54,24 @@ class vcam:
         self.K = np.array([[-self.focus / self.sx, self.sh, self.ox], [0, self.focus / self.sy, self.oy], [0, 0, 1]])
         self.M1 = np.array([[1, 0, 0, -self.Tx], [0, 1, 0, -self.Ty], [0, 0, 1, -self.Tz]])
         self.RT = np.matmul(self.R, self.M1)
+
+    def fisheye_trans(self, src, ratio):
+        """
+        对直线图片进行变换来产生鱼眼效果，这里参照的是论文：Universal Semantic Segmentation for Fisheye Urban Driving Images
+        对应的代码在FisheyeSeg/data/FishEyeGenerator.py/_calc_cord_map
+        """
+
+        # shape
+        cord = src[0:2, :] / ratio
+        radius_array = np.sqrt(np.square(cord[0, :]) + np.square(cord[1, :]))
+        theta_array = radius_array/self.focus
+
+        new_x = np.tan(theta_array) * cord[0, :] / radius_array * self.focus
+        new_y = np.tan(theta_array) * cord[1, :] / radius_array * self.focus
+
+        return np.stack([new_x, new_y, src[2, :], src[3, :]], axis=0)
+
+
 
     def project(self, src):
         """
@@ -138,6 +156,9 @@ class vcam:
         获得真实图像到畸变图像的映射矩阵
         """
         pts1, pts2 = np.split(pts2d, 2)
+
+
+
         x = pts1.reshape(self.H, self.W)
         y = pts2.reshape(self.H, self.W)
         return x.astype(np.float32), y.astype(np.float32)
@@ -164,8 +185,8 @@ class meshGen:
         self.W = W
 
         # 将物面进行切分，分别在x和y方向上
-        x = np.linspace(-self.W / 2, self.W / 2, self.W)
-        y = np.linspace(-self.H / 2, self.H / 2, self.H)
+        x = np.linspace(0, self.W, self.W)
+        y = np.linspace(0, self.H , self.H)
 
         # 依据切分来构造网格，xv和yv分别代表了从axis=0时和axis=1方向的坐标
         xv, yv = np.meshgrid(x, y)

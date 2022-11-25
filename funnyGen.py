@@ -12,21 +12,24 @@ def FunnyGen(path):
     camera = vcam(H=H, W=W)
 
     # 设置参数
-    camera.focus = 100
+    camera.focus = 200
     camera.update_M()
 
     # 创建surface：将被处理的图像视为一个平的平面(no depth consideration for pixel)
-    plane = meshGen(H, W)
+    plane = meshGen(400, 400)
 
     # wrapping the surface：可以构造鱼眼镜头
-    # plane.Z -= 100*np.sqrt((plane.X*2.0/plane.W)**2+(plane.Y*2.0/plane.H)**2)
+    plane.Z -= 100*np.sqrt((plane.X*2.0/plane.W)**2+(plane.Y*2.0/plane.H)**2)
     plane.drawMesh("dst")
 
     # 获得三维坐标
     pts3d = plane.getPlane()
 
+    # 获得鱼眼变换坐标
+    fish3d = camera.fisheye_trans(pts3d, 0.5)
+
     # 设置桶形畸变
-    camera.set_barral_dist(1, 0.1, 0.1)
+    #camera.set_barral_dist(1, 0.1, 0.1)
 
     # 设置枕形畸变
 
