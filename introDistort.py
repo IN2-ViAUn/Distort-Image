@@ -121,18 +121,21 @@ def test_distortion(img_path):
     fisheye_distort.set_ext_params([0, 0, 0, 0, 0, -1])
     dst1 = fisheye_distort.transFromColor(src, reuse=False)
     cv.imshow("fisheye_dst", dst1)
+    cv.imwrite(os.path.join(images_root, "test_distortion//test_fisheye.png"), dst1)
 
     # 桶形畸变
     barral_distort = VirtualCamera(dst_h=H, dst_w=W, src_shape=src.shape)
     barral_distort.set_barral_dist(1, 0.5, 0.1)
-    dst2 = barral_distort.transFromColor(src, 200, reuse=False)
+    dst2 = barral_distort.transFromColor(src, 100, reuse=False)
     cv.imshow("barral_dst", dst2)
+    cv.imwrite(os.path.join(images_root, "test_distortion//test_barral.png"), dst2)
 
     # 枕形畸变
     pincushion_distort = VirtualCamera(dst_h=H, dst_w=W, src_shape=src.shape)
     pincushion_distort.set_Pillow_dist(-0.07, 0.0)
     dst3 = pincushion_distort.transFromColor(src, 200, reuse=False)
     cv.imshow("pincushion_dst", dst3)
+    cv.imwrite(os.path.join(images_root, "test_distortion//test_pincushion.png"), dst3)
 
     cv.waitKey(0)
 
