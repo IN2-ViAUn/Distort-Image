@@ -11,10 +11,13 @@
 
 ***
 * 原图：
-![图片](images/00000.png)
+![图片](images/00000.png)    
+
 * 鱼眼畸变，focal:400
-![图片](images/test_distortion/test_fisheye.png)
+![图片](images/test_distortion/test_fisheye.png)    
+
 * 桶形畸变 focal:100, barral_dis: 1
-![图片](images/test_distortion/test_barral.png)
+![图片](images/test_distortion/test_barral.png)  
+
 * 枕形畸变 focal:100 pincushion_dis:-0.07
 ![图片](images/test_distortion/test_pincushion.png)
