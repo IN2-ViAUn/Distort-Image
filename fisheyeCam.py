@@ -9,12 +9,15 @@ import sys
 class FishEyeGenerator:
 
     # dst_shape format: [rows, cols]
-    def __init__(self, focal_len, dst_shape):
+    def __init__(self, focal_len, dst_shape, cut = False):
 
         self._focal_len = focal_len
         # 输出的鱼眼图像的行和列大小
         self._shape = dst_shape
         self._ratio = min(self._shape[0], self._shape[1]) / (self._focal_len * pi)
+
+        # 是否要进行裁剪，去掉冗余的黑色框
+        self.cut = cut
 
         mask = np.ones([self._shape[0], self._shape[1]], dtype=np.uint8)
         square_r = (min(self._shape[0], self._shape[1]) / 2) ** 2
@@ -143,8 +146,8 @@ class FishEyeGenerator:
         self._z_trans = self.ZTRANS_RANGE[0] * (1 - temp) + self.ZTRANS_RANGE[1] * temp
 
     def _calc_cord_map(self, cv_img):
-        self._init_ext_matrix()
-        self._init_pin_matrix(cv_img.shape)
+        self._init_ext_matrix()  # 得到的矩阵是六个参数自由度：旋转和平移
+        self._init_pin_matrix(cv_img.shape)  # 得到的是从相机坐标系到平面坐标系的转换矩阵
 
         src_rows = cv_img.shape[0]
         src_cols = cv_img.shape[1]
@@ -157,7 +160,7 @@ class FishEyeGenerator:
         cord = cord.reshape(-1, 2)
 
         # shape=(dst_rows*dst_cols, 2)
-        cord = np.array(cord) / self._ratio
+        # cord = np.array(cord) / self._ratio # ？？？？？？
 
         radius_array = np.sqrt(np.square(cord[:, 0]) + np.square(cord[:, 1])) + 1e-10
         theta_array = radius_array / self._focal_len
@@ -192,8 +195,8 @@ class FishEyeGenerator:
         self._map_rows = pin_image_cords[:, 1]
 
         # bug1: 少了一个平移
-        self._map_rows = self._map_rows + np.float(src_rows/2)
-        self._map_cols = self._map_cols + np.float(src_cols/2)
+        self._map_rows = self._map_rows + np.float(src_rows / 2)
+        self._map_cols = self._map_cols + np.float(src_cols / 2)
 
         self._map_cols = self._map_cols.round().astype(int)
         self._map_rows = self._map_rows.round().astype(int)
@@ -205,9 +208,53 @@ class FishEyeGenerator:
         index5 = pin_image_cords[:, 2] <= 0
 
         bad_index = index1 | index2 | index3 | index4
-        bad_index = bad_index | self._bad_index
+        # bad_index = bad_index | self._bad_index
+
+        if self.cut:
+            self.get_cut_cord(bad_index)
+
         self._map_cols[bad_index] = cv_img.shape[1]
         self._map_rows[bad_index] = 0
+
+    def get_cut_cord(self, bad_index):
+        col_check, row_check = (False, False)
+        bad_index = bad_index.reshape(self._shape)
+        index_shape = bad_index.shape
+        top_left = [0, 0]
+
+        for i in range(max(self._shape)):
+            if i < index_shape[0]:
+                if False in bad_index[i, :] and row_check is False:
+                    top_left[0] = i
+                    row_check = True
+
+            if i < index_shape[1]:
+                if False in bad_index[:, i] and col_check is False:
+                    top_left[1] = i
+                    col_check = True
+
+            if row_check is True and col_check is True:
+                break
+
+        self.top_left = top_left
+        col_check, row_check = (False, False)
+        down_right = list(self._shape)
+
+        for i in range(max(self._shape)).__reversed__():
+            if i < index_shape[0]:
+                if False in bad_index[i, :] and row_check is False:
+                    down_right[0] = i
+                    row_check = True
+
+            if i < index_shape[1]:
+                if False in bad_index[:, i] and col_check is False:
+                    down_right[1] = i
+                    col_check = True
+
+            if row_check is True and col_check is True:
+                break
+
+        self.down_right = down_right
 
     def _extend_img_color(self, cv_img):
         dst_img = np.hstack((cv_img, np.zeros((cv_img.shape[0], 1, 3), dtype=np.uint8)))
@@ -226,6 +273,8 @@ class FishEyeGenerator:
         cv_img = self._extend_img_color(cv_img)
         dst = np.array(cv_img[(self._map_rows, self._map_cols)])
         dst = dst.reshape(self._shape[0], self._shape[1], 3)
+        if self.cut:
+            dst = dst[self.top_left[0]: self.down_right[0], self.top_left[1]: self.down_right[1], :]
         return dst
 
     def transFromGray(self, cv_img, reuse=False):
@@ -239,7 +288,6 @@ class FishEyeGenerator:
 
 
 def test_color():
-
     img = cv2.imread("D://New_Pycharm_Project//Distorted//images//00000.png")
     trans = FishEyeGenerator(300, [img.shape[0], img.shape[1]])
     # im_annot = cv2.imread("F:/Code/Github/FisheyeSeg/annot.png", 0)

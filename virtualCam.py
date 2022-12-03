@@ -139,8 +139,8 @@ class VirtualCamera:
             # dis_x = x_1 * K + 2.0 * self.KpCoeff[3] * x_y + self.KpCoeff[4] * (r_2 + 2.0 * x_2)
             # dis_y = y_1 * K + 2.0 * self.KpCoeff[4] * x_y + self.KpCoeff[3] * (r_2 + 2.0 * y_2)
 
-            dis_x = x_1 * K + x_1 * self.KpCoeff[3] * r_2
-            dis_y = y_1 * K + y_1 * self.KpCoeff[3] * r_2
+            dis_x = x_1 * K + x_1 * self.KpCoeff[3] * np.sqrt(r_2)
+            dis_y = y_1 * K + y_1 * self.KpCoeff[3] * np.sqrt(r_2)
 
             # camera coordinate -> image coordinate(这个时候就不是中心是原点了)
             x = self.K[0, 0] * dis_x + self.K[0, 2]
@@ -203,7 +203,6 @@ class MeshGen:
     def __init__(self, H, W):
         self.H = H
         self.W = W
-
         # 将物面进行切分，分别在x和y方向上
         x = np.linspace(-self.W / 2, self.W / 2, self.W)
         y = np.linspace(-self.H / 2, self.H / 2, self.H)

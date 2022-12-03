@@ -115,6 +115,8 @@ def test_distortion(img_path):
     src = cv.imread(os.path.join(images_root, img_path))
     cv.imshow("src", src)
     H, W = src.shape[:2]
+    # H = min(H, W)
+    # W = H
 
     # 鱼眼变换
     fisheye_distort = FishEyeGenerator(200, [H, W])
@@ -132,7 +134,7 @@ def test_distortion(img_path):
 
     # 枕形畸变
     pincushion_distort = VirtualCamera(dst_h=H, dst_w=W, src_shape=src.shape)
-    pincushion_distort.set_Pillow_dist(-0.07, 0.0)
+    pincushion_distort.set_Pillow_dist(-0.17, 0.0)
     dst3 = pincushion_distort.transFromColor(src, 200, reuse=False)
     cv.imshow("pincushion_dst", dst3)
     cv.imwrite(os.path.join(images_root, "test_distortion//test_pincushion.png"), dst3)
@@ -141,4 +143,4 @@ def test_distortion(img_path):
 
 
 # 测试images下的某一张图片
-test_distortion("00000.png")
+test_distortion("2010_002065.jpg")
