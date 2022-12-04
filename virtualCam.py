@@ -89,22 +89,6 @@ class VirtualCamera:
         self.M1 = np.array([[1, 0, 0, -self.Tx], [0, 1, 0, -self.Ty], [0, 0, 1, -self.Tz]])
         self.RT = np.matmul(self.R, self.M1)
 
-    # def fisheye_trans(self, src, ratio):
-    #     """
-    #     对直线图片进行变换来产生鱼眼效果，这里参照的是论文：Universal Semantic Segmentation for Fisheye Urban Driving Images
-    #     对应的代码在FisheyeSeg/data/FishEyeGenerator.py/_calc_cord_map
-    #     """
-    #
-    #     # shape
-    #     cord = src[0:2, :] / ratio
-    #     radius_array = np.sqrt(np.square(cord[0, :]) + np.square(cord[1, :]))
-    #     theta_array = radius_array/self.focus
-    #
-    #     new_x = np.tan(theta_array) * cord[0, :] / radius_array * self.focus
-    #     new_y = np.tan(theta_array) * cord[1, :] / radius_array * self.focus
-    #
-    #     return np.stack([new_x, new_y, src[2, :], src[3, :]], axis=0)
-
     def project(self, src):
         """
         实现从世界坐标系到像素坐标系的变换
@@ -127,10 +111,9 @@ class VirtualCamera:
             # 计算畸变泰勒公式的半径值
             x_2 = x_1 ** 2
             y_2 = y_1 ** 2
-            x_y = x_1 * y_1
-            r_2 = x_2 + y_2
+            r_2 = np.sqrt(x_2 + y_2)
             r_4 = r_2 ** 2
-            r_6 = r_2 ** 3
+            r_6 = r_4 ** 2
 
             # 计算桶形畸变参数K
             K = (1 + self.KpCoeff[0] * r_2 + self.KpCoeff[1] * r_4 + self.KpCoeff[2] * r_6)
@@ -166,6 +149,9 @@ class VirtualCamera:
             self.update_M()
 
         plane = MeshGen(self.H, self.W)
+        # plane.Z -= 20*np.sin(2*np.pi*((plane.X-(plane.W)/4.0)/plane.W)) + 20*np.sin(2*np.pi*((plane.Y-plane.H/4.0)/plane.H))
+        plane.Z -= 100 * np.sqrt((plane.X * 1.0 / plane.W) ** 2 + (plane.Y * 1.0 / plane.H) ** 2)
+        plane.drawMesh("dst")
         pts3d = plane.getPlane()
         pts2d = self.project(pts3d)
         map_x, map_y = self.getMaps(pts2d)
@@ -217,7 +203,7 @@ class MeshGen:
         self.Z = self.X * 0 + 1  # The mesh will be located on Z = 1 plane
 
         # 绘制meshgrid
-        # self.drawMesh()
+        self.drawMesh()
 
     def getPlane(self):
         return np.concatenate(([self.X], [self.Y], [self.Z], [self.X * 0 + 1]))[:, :, 0]
@@ -236,5 +222,15 @@ class MeshGen:
                yticklabels=[],
                zticklabels=[])
         fig.suptitle(title)
+        fig.savefig("images//test_distortion//" + title + '.png')
         # ax.set_title(title, loc="center")
         plt.show()
+
+
+img = cv2.imread("images/000712.jpg")
+cv2.imshow("src",img)
+funny = VirtualCamera(img.shape[0], img.shape[1], img.shape)
+output = funny.transFromColor(img, 100)
+cv2.imshow("dst", output)
+cv2.imwrite("images//test_distortion//test_funny.png", output)
+cv2.waitKey(0)

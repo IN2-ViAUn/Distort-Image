@@ -9,7 +9,7 @@ import sys
 class FishEyeGenerator:
 
     # dst_shape format: [rows, cols]
-    def __init__(self, focal_len, dst_shape, cut = False):
+    def __init__(self, focal_len, dst_shape, cut=True):
 
         self._focal_len = focal_len
         # 输出的鱼眼图像的行和列大小
@@ -122,9 +122,9 @@ class FishEyeGenerator:
         :param extParam: a list with 6 float
         :return: void
         '''
-        self._alpha = extParam[0] * pi / 180
-        self._beta = extParam[1] * pi / 180
-        self._theta = extParam[2] * pi / 180
+        self._alpha = extParam[0] * pi / 360
+        self._beta = extParam[1] * pi / 360
+        self._theta = extParam[2] * pi / 360
 
         self._x_trans = extParam[3] * self._shape[1]
         self._y_trans = extParam[4] * self._shape[0]
@@ -164,6 +164,17 @@ class FishEyeGenerator:
 
         radius_array = np.sqrt(np.square(cord[:, 0]) + np.square(cord[:, 1])) + 1e-10
         theta_array = radius_array / self._focal_len
+
+        # barrel = True
+        # if barrel:
+        #     x_c = dst_cols/2
+        #     y_c = dst_rows/2
+        #     new_x_array = cord[:, 0] / x_c
+        #     new_y_array = cord[:, 1] / y_c
+        #     radius = np.sqrt(new_x_array ** 2 +new_y_array ** 2)
+        #     K = (1 + 1 *radius + 0.05 * radius**2)
+        #     new_x_array = new_x_array * K * x_c
+        #     new_y_array = new_y_array * K * y_c
 
         # bug2：计算公式有错
         new_x_array = (np.tan(theta_array) * cord[:, 0] / radius_array) * self._focal_len
