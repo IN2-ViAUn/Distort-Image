@@ -1,8 +1,8 @@
+# Distort image ![](https://img.shields.io/badge/Organ.-IN2--ViAUn-blue)  ![](https://img.shields.io/badge/Version-1.0-yellow)
+
 <div align="center">
     <img src="./images/readme/distort.gif" width=50%  >
 </div>
-
-# Distort image ![](https://img.shields.io/badge/Organ.-IN2--ViAUn-blue)  ![](https://img.shields.io/badge/Version-1.0-yellow)
 
 ## Introduction
 
