@@ -1,7 +1,8 @@
+# Distort image ![](https://img.shields.io/badge/Organ.-IN2--ViAUn-blue)  ![](https://img.shields.io/badge/Version-1.0-yellow)
 <img src="./images/readme/distort.gif" width=50%  >
 
-# Distort image ![](https://img.shields.io/badge/Organ.-IN2--ViAUn-blue)  ![](https://img.shields.io/badge/Version-1.0-yellow)
 ## Introduction
+
 本项目旨在实现在**正常图形**中插入鱼眼畸变/桶形畸变/枕形畸变三种类型的畸变 
 现已经可以实现在整个图形上做畸变，并且每种畸变下都有7DoV(degree of freedom)  
 下一步的计划是实现在正常图形的任意位置上插入任意类型的畸变
