@@ -1,5 +1,8 @@
+<div align="center">
+    <img src="./images/readme/distort.gif" width=50%  >
+</div>
+
 # Distort image ![](https://img.shields.io/badge/Organ.-IN2--ViAUn-blue)  ![](https://img.shields.io/badge/Version-1.0-yellow)
-<img src="./images/readme/distort.gif" width=50%  >
 
 ## Introduction
 
@@ -8,10 +11,10 @@
 下一步的计划是实现在正常图形的任意位置上插入任意类型的畸变
 
 主要包含两个模块：
-* virtualCam.py:用来创建一个可以实现径向畸变、哈哈镜畸变的虚拟相机
-* fisheyeCam.py：用来创建一个可以实现鱼眼畸变的虚拟相机  
+* [virtualCam.py](./virtualCam.py):用来创建一个可以实现径向畸变、哈哈镜畸变的虚拟相机
+* [fisheyeCam.py](./fisheyeCam.py)：用来创建一个可以实现鱼眼畸变的虚拟相机  
 
-使用可以直接参照[introDistort.py]("./introDistort.py")文件，不必关注实现细节(可能需要一个不断调参的过程才能得到自己想要的效果)
+使用可以直接参照[introDistort.py]()文件，不必关注实现细节(可能需要一个不断调参的过程才能得到自己想要的效果)
 
 值得声明的是，本项目的鱼眼部分的实现大部分来自：[Universal Semantic Segmentation for Fisheye Urban Driving Images](https://arxiv.org/abs/2002.03736)的官方代码  
 
@@ -28,7 +31,7 @@
   test_distortion("000712.jpg")
   ```
 
-​	也可以通过[introDistort]("./introDistort.py")下的`fisheye_distortion, barral_distortion, pincushion_distortion`函数来实现批量处理
+​	也可以通过[introDistort](./introDistort.py)下的`fisheye_distortion, barral_distortion, pincushion_distortion`函数来实现批量处理
 
 ## Results
 
@@ -47,6 +50,8 @@
 #### Pincushion Distortion
 
 ![](images/readme/枕形.png)    
+
+***
 
 
 
