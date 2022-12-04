@@ -35,19 +35,15 @@
 
 ## Results
 
-#### Fisheye Distortion
+### Fisheye Distortion
 
 ![](images/readme/fisheye.png)
 
-***
-
-#### Barrel Distortion
+### Barrel Distortion
 
 ![](images/readme/barrel.png)
 
-***
-
-#### Pincushion Distortion
+### Pincushion Distortion
 
 ![](images/readme/枕形.png)    
 
@@ -61,7 +57,9 @@
 
 但是是否可以通过在三维空间中操作像平面的方式来实现畸变
 
-#### Barrel Distortion by Warping Mesh
+### Barrel Distortion by Warping Mesh
+
+src->dst: `plane.Z -= 100 * np.sqrt((plane.X * 1.0 / plane.W) ** 2 + (plane.Y * 1.0 / plane.H) ** 2)`
 
 <img src="./images/readme/warp2.png" width=70%  >
 
@@ -70,6 +68,8 @@
 ***
 
 #### Pincushion Distortion by Warping Mesh
+
+src->dst:`plane.Z += 20*np.sin(2*np.pi*((plane.X-(plane.W)/4.0)/plane.W)) + 20*np.sin(2*np.pi*((plane.Y-plane.H/4.0)/plane.H))`
 
 <img src="./images/readme/warp1.png" width=70%  >
 
